@@ -55,69 +55,61 @@
     </table>
 
     <script>
-        const sheetAPI = "https://script.google.com/macros/s/AKfycbyUr3OpkUvekPSl8Q02TRjiUPZzEwCJuBc8K_GuN9HtvjQPk8ek7XX4WS7h8e0yu_n4/exec"; // Gunakan JSONP
-
-        function handleResponse(data) {
-            let rows = "";
-            data.slice(1).forEach((item) => {
-                rows += `<tr>
-                            <td>${item[0]} ${item[1]}</td>
-                            <td>${item[4]}</td>
-                        </tr>`;
-            });
-            document.getElementById("barang-list").innerHTML = rows;
-        }
+        const sheetAPI = "https://script.google.com/macros/s/AKfycbzG-48Cdh580TIQ7o_qMsheH6a1UWp41YLM1Jf1ktZEupqgau7L9gMtSmGMfjI6U47R/exec";
 
         function loadBarang() {
-            let script = document.createElement("script");
-            script.src = sheetAPI;
-            document.body.appendChild(script);
+            fetch(sheetAPI)
+                .then(response => response.json())
+                .then(data => {
+                    let rows = "";
+                    data.slice(1).forEach((item) => {
+                        rows += `<tr>
+                                    <td>${item[0]} ${item[1]}</td>
+                                    <td>${item[4]}</td>
+                                </tr>`;
+                    });
+                    document.getElementById("barang-list").innerHTML = rows;
+                })
+                .catch(error => {
+                    console.error("Gagal mengambil data:", error);
+                });
         }
 
         function tambahBarang() {
-    let warna = document.getElementById("warnaBaju").value;
-    let jenis = document.getElementById("jenisBaju").value;
-    let masuk = document.getElementById("bajuMasuk").value || "0";
-    let keluar = document.getElementById("bajuKeluar").value || "0";
+            let warna = document.getElementById("warnaBaju").value;
+            let jenis = document.getElementById("jenisBaju").value;
+            let masuk = document.getElementById("bajuMasuk").value || "0";
+            let keluar = document.getElementById("bajuKeluar").value || "0";
 
-    if (!warna || !jenis) {
-        alert("Harap pilih warna dan jenis baju.");
-        return;
-    }
+            if (!warna || !jenis) {
+                alert("Harap pilih warna dan jenis baju.");
+                return;
+            }
 
-    let data = {
-        warna: warna,
-        jenis: jenis,
-        masuk: masuk,
-        keluar: keluar
-    };
+            let data = { warna, jenis, masuk, keluar };
 
-    console.log("Mengirim data:", data);
+            console.log("Mengirim data:", data);
 
-    fetch("https://script.google.com/macros/s/AKfycbzG-48Cdh580TIQ7o_qMsheH6a1UWp41YLM1Jf1ktZEupqgau7L9gMtSmGMfjI6U47R/exec", {
-        method: "POST",
-        mode: "cors", // Tambahkan mode CORS
-        headers: {
-            "Content-Type": "application/json"
-        },
-        body: JSON.stringify(data)
-    })
-    .then(response => response.json())
-    .then(result => {
-        console.log("Hasil:", result);
-        if (result.status === "success") {
-            alert(result.message);
-            loadBarang();
-        } else {
-            alert("Gagal memperbarui stok.");
+            fetch(sheetAPI, {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify(data)
+            })
+            .then(response => response.json())
+            .then(result => {
+                console.log("Hasil:", result);
+                if (result.status === "success") {
+                    alert(result.message);
+                    loadBarang();
+                } else {
+                    alert("Gagal memperbarui stok.");
+                }
+            })
+            .catch(error => {
+                console.error("Terjadi kesalahan:", error);
+                alert("Terjadi kesalahan, coba lagi.");
+            });
         }
-    })
-    .catch(error => {
-        console.error("Terjadi kesalahan:", error);
-        alert("Terjadi kesalahan, coba lagi.");
-    });
-}
-
 
         loadBarang();
     </script>
