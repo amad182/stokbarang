@@ -4,19 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Aplikasi Stok Barang</title>
-    <style>
-        body { font-family: Arial, sans-serif; padding: 20px; }
-        table { width: 100%; border-collapse: collapse; margin-top: 20px; }
-        th, td { border: 1px solid black; padding: 10px; text-align: left; }
-        th { background-color: #f4f4f4; }
-        select, input { margin: 5px; padding: 10px; }
-    </style>
-</head>
-    <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Aplikasi Stok Barang</title>
-    <link rel="icon" type="image/x-icon" href="favicon.ico">
+    <link rel="icon" type="image/x-icon" href="favicon.ico"> <!-- Tambahkan Favicon -->
     <style>
         body { font-family: Arial, sans-serif; padding: 20px; }
         table { width: 100%; border-collapse: collapse; margin-top: 20px; }
@@ -87,44 +75,39 @@
         }
 
         function tambahBarang() {
-    let warna = document.getElementById("warnaBaju").value;
-    let jenis = document.getElementById("jenisBaju").value;
-    let masuk = document.getElementById("bajuMasuk").value || "0";
-    let keluar = document.getElementById("bajuKeluar").value || "0";
+            const warna = document.getElementById("warnaBaju").value;
+            const jenis = document.getElementById("jenisBaju").value;
+            const masuk = parseInt(document.getElementById("bajuMasuk").value) || 0;
+            const keluar = parseInt(document.getElementById("bajuKeluar").value) || 0;
 
-    if (!warna || !jenis) {
-        alert("Pilih warna dan jenis baju!");
-        return;
-    }
+            if (!warna || !jenis) {
+                alert("Silakan pilih warna dan jenis baju.");
+                return;
+            }
 
-    let data = { warna, jenis, masuk, keluar };
-    console.log("Mengirim data:", data);
+            const data = { warna, jenis, masuk, keluar };
 
-    fetch("https://script.google.com/macros/s/AKfycbwQhtWX0IL9PF2gyJSfmL6fd0edDTQprpbNcmErh6YwXFSjEsqCOyGWh9bN_z23OuU/exec", {
-        method: "POST",
-        mode: "cors",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(data)
-    })
-    .then(response => {
-        console.log("Response status:", response.status); // Cek status response
-        return response.json();
-    })
-    .then(result => {
-        console.log("Response dari server:", result);
-        if (result.status === "success") {
-            alert(result.message);
-            loadBarang(); // Refresh daftar stok
-        } else {
-            alert("Gagal update stok: " + result.message);
+            console.log("Mengirim data:", data);
+
+            fetch("https://script.google.com/macros/s/AKfycbwQhtWX0IL9PF2gyJSfmL6fd0edDTQprpbNcmErh6YwXFSjEsqCOyGWh9bN_z23OuU/exec", {
+                method: "POST",
+                mode: "cors",
+                headers: {
+                    "Content-Type": "application/json"
+                },
+                body: JSON.stringify(data)
+            })
+            .then(response => response.json())
+            .then(result => {
+                console.log("Hasil:", result);
+                alert("Stok berhasil diperbarui!");
+                loadBarang();
+            })
+            .catch(error => {
+                console.error("Terjadi kesalahan:", error);
+                alert("Gagal mengupdate stok.");
+            });
         }
-    })
-    .catch(error => {
-        console.error("Terjadi kesalahan:", error);
-        alert("Gagal mengupdate stok. Cek console untuk detail.");
-    });
-}
-
 
         loadBarang();
     </script>
