@@ -75,39 +75,49 @@
         }
 
         function tambahBarang() {
-            const warna = document.getElementById("warnaBaju").value;
-            const jenis = document.getElementById("jenisBaju").value;
-            const masuk = parseInt(document.getElementById("bajuMasuk").value) || 0;
-            const keluar = parseInt(document.getElementById("bajuKeluar").value) || 0;
+    let warna = document.getElementById("warnaBaju").value;
+    let jenis = document.getElementById("jenisBaju").value;
+    let masuk = document.getElementById("bajuMasuk").value || "0";
+    let keluar = document.getElementById("bajuKeluar").value || "0";
 
-            if (!warna || !jenis) {
-                alert("Silakan pilih warna dan jenis baju.");
-                return;
-            }
+    if (!warna || !jenis) {
+        alert("Harap pilih warna dan jenis baju.");
+        return;
+    }
 
-            const data = { warna, jenis, masuk, keluar };
+    let data = {
+        warna: warna,
+        jenis: jenis,
+        masuk: masuk,
+        keluar: keluar
+    };
 
-            console.log("Mengirim data:", data);
+    console.log("Mengirim data:", data);
 
-            fetch("https://script.google.com/macros/s/AKfycbwQhtWX0IL9PF2gyJSfmL6fd0edDTQprpbNcmErh6YwXFSjEsqCOyGWh9bN_z23OuU/exec", {
-                method: "POST",
-                mode: "cors",
-                headers: {
-                    "Content-Type": "application/json"
-                },
-                body: JSON.stringify(data)
-            })
-            .then(response => response.json())
-            .then(result => {
-                console.log("Hasil:", result);
-                alert("Stok berhasil diperbarui!");
-                loadBarang();
-            })
-            .catch(error => {
-                console.error("Terjadi kesalahan:", error);
-                alert("Gagal mengupdate stok.");
-            });
+    fetch("https://script.google.com/macros/s/AKfycbzG-48Cdh580TIQ7o_qMsheH6a1UWp41YLM1Jf1ktZEupqgau7L9gMtSmGMfjI6U47R/exec", {
+        method: "POST",
+        mode: "cors", // Tambahkan mode CORS
+        headers: {
+            "Content-Type": "application/json"
+        },
+        body: JSON.stringify(data)
+    })
+    .then(response => response.json())
+    .then(result => {
+        console.log("Hasil:", result);
+        if (result.status === "success") {
+            alert(result.message);
+            loadBarang();
+        } else {
+            alert("Gagal memperbarui stok.");
         }
+    })
+    .catch(error => {
+        console.error("Terjadi kesalahan:", error);
+        alert("Terjadi kesalahan, coba lagi.");
+    });
+}
+
 
         loadBarang();
     </script>
