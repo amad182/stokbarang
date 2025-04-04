@@ -1,0 +1,120 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Aplikasi Stok Barang</title>
+    <style>
+        body { font-family: Arial, sans-serif; padding: 20px; }
+        table { width: 100%; border-collapse: collapse; margin-top: 20px; }
+        th, td { border: 1px solid black; padding: 10px; text-align: left; }
+        th { background-color: #f4f4f4; }
+        select, input { margin: 5px; padding: 10px; }
+    </style>
+</head>
+<body>
+
+    <h2>Aplikasi Stok Barang</h2>
+
+    <label>Warna Baju:</label>
+    <select id="warnaBaju">
+        <option value="">Pilih Warna</option>
+        <option value="Hitam">Hitam</option>
+        <option value="Putih">Putih</option>
+        <option value="Warna Lainnya">Warna Lainnya</option>
+    </select>
+
+    <label>Jenis Baju:</label>
+    <select id="jenisBaju">
+        <option value="">Pilih Jenis</option>
+        <option value="Baju Brand">Baju Brand</option>
+        <option value="Kota Tua">Kota Tua</option>
+        <option value="Baju Gambar">Baju Gambar</option>
+        <option value="Lengan Panjang">Lengan Panjang</option>
+        <option value="Kaos Anak">Kaos Anak</option>
+    </select>
+
+    <label>Baju Masuk:</label>
+    <input type="number" id="bajuMasuk" placeholder="Jumlah" min="1">
+
+    <label>Baju Keluar:</label>
+    <input type="number" id="bajuKeluar" placeholder="Jumlah" min="1">
+
+    <button onclick="tambahBarang()">Tambah / Kurangi</button>
+
+    <h3>Daftar Stok Barang</h3>
+    <table>
+        <thead>
+            <tr>
+                <th>Stok Saat Ini</th>
+                <th>Jumlah</th>
+            </tr>
+        </thead>
+        <tbody id="barang-list"></tbody>
+    </table>
+
+    <script>
+        const sheetAPI = "https://script.google.com/macros/s/AKfycbwQhtWX0IL9PF2gyJSfmL6fd0edDTQprpbNcmErh6YwXFSjEsqCOyGWh9bN_z23OuU/exec?callback=handleResponse"; // Gunakan JSONP
+
+        function handleResponse(data) {
+            let rows = "";
+            data.slice(1).forEach((item) => {
+                rows += `<tr>
+                            <td>${item[0]} ${item[1]}</td>
+                            <td>${item[4]}</td>
+                        </tr>`;
+            });
+            document.getElementById("barang-list").innerHTML = rows;
+        }
+
+        function loadBarang() {
+            let script = document.createElement("script");
+            script.src = sheetAPI;
+            document.body.appendChild(script);
+        }
+
+        function tambahBarang() {
+    let warna = document.getElementById("warnaBaju").value;
+    let jenis = document.getElementById("jenisBaju").value;
+    let masuk = document.getElementById("bajuMasuk").value || "0";
+    let keluar = document.getElementById("bajuKeluar").value || "0";
+
+    if (!warna || !jenis) {
+        alert("Pilih warna dan jenis baju!");
+        return;
+    }
+
+    let data = { warna, jenis, masuk, keluar };
+    console.log("Mengirim data:", data);
+
+    fetch("https://script.google.com/macros/s/AKfycbwQhtWX0IL9PF2gyJSfmL6fd0edDTQprpbNcmErh6YwXFSjEsqCOyGWh9bN_z23OuU/exec", {
+        method: "POST",
+        mode: "cors",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(data)
+    })
+    .then(response => {
+        console.log("Response status:", response.status); // Cek status response
+        return response.json();
+    })
+    .then(result => {
+        console.log("Response dari server:", result);
+        if (result.status === "success") {
+            alert(result.message);
+            loadBarang(); // Refresh daftar stok
+        } else {
+            alert("Gagal update stok: " + result.message);
+        }
+    })
+    .catch(error => {
+        console.error("Terjadi kesalahan:", error);
+        alert("Gagal mengupdate stok. Cek console untuk detail.");
+    });
+}
+
+
+        loadBarang();
+    </script>
+
+</body>
+</html>
